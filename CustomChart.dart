@@ -63,18 +63,8 @@ class WeekdayBarChartState extends State<WeekdayBarChart> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: BarChart(
-                            mainBarData(),
-                            swapAnimationDuration: animDuration,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
+                      Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: BarChart(mainBarData(), swapAnimationDuration: animDuration,),),),
+                      const SizedBox(height: 12,),
                     ],
                   ),
                 ),
