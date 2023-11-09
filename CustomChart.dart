@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class CustomChart extends StatefulWidget {
-  const CustomChart({ Key? key, this.width, this.height, this.numbers = const [5.0, 7.2, 3.1, 4.2, 8.2, 4.5, 4.5], this.backgroundColor = Colors.white, this.barBackgroundColor = Colors.grey, this.barColor = Colors.blue, this.touchedBarColor = Colors.red, }) : super(key: key);
+  const CustomChart({ Key? key, this.width, this.height, this.numbers = const [5.0, 7.2, 3.1, 4.2, 8.2, 4.5, 4.5], this.backgroundColor = Colors.white, this.barBackgroundColor = Colors.grey, this.barColor = Colors.blue, this.touchedBarColor = Colors.red, this.labelTextColor = Colors.white, this.axisTextColor = Colors.black,}) : super(key: key);
   final double? width;
   final double? height;
   final List<double> numbers;
@@ -14,6 +14,8 @@ class CustomChart extends StatefulWidget {
   final Color barBackgroundColor;
   final Color barColor;
   final Color touchedBarColor;
+  final Color labelTextColor;
+  final Color axisTextColor;
 
   @override
   CustomChartState createState() => CustomChartState();
@@ -22,16 +24,18 @@ class CustomChart extends StatefulWidget {
 class CustomChartState extends State<CustomChart> {
   @override
   Widget build(BuildContext context) {
-    return WeekdayBarChart(numbers: widget.numbers,backgroundColor: widget.backgroundColor,barBackgroundColor: widget.barBackgroundColor,barColor: widget.barColor,touchedBarColor: widget.touchedBarColor);
+    return WeekdayBarChart(numbers: widget.numbers,backgroundColor: widget.backgroundColor,barBackgroundColor: widget.barBackgroundColor,barColor: widget.barColor,touchedBarColor: widget.touchedBarColor, labelTextColor: widget.labelTextColor, axisTextColor: widget.axisTextColor);
   }
 }
 
 class WeekdayBarChart extends StatefulWidget {
-  WeekdayBarChart({Key? key, required this.numbers, required this.backgroundColor, required this.barBackgroundColor, required this.barColor, required this.touchedBarColor}) : super(key: key);
+  WeekdayBarChart({Key? key, required this.numbers, required this.backgroundColor, required this.barBackgroundColor, required this.barColor, required this.touchedBarColor, required this.labelTextColor, required this.axisTextColor}) : super(key: key);
   final Color backgroundColor;
   final Color barBackgroundColor;
   final Color barColor;
   final Color touchedBarColor;
+  final Color labelTextColor;
+  final Color axisTextColor;
   final List<double> numbers;
 
   @override
@@ -91,7 +95,7 @@ class WeekdayBarChartState extends State<WeekdayBarChart> {
           color: isTouched ? widget.touchedBarColor : barColor,
           width: width,
           borderSide: isTouched ? BorderSide(color: Colors.white, width: 0.0) : const BorderSide(color: Colors.white, width: 0),
-          backDrawRodData: BackgroundBarChartRodData(show: true, toY: 20, color: widget.barBackgroundColor, ),
+          backDrawRodData: BackgroundBarChartRodData(show: true, toY: widget.numbers.reduce(max)+2, color: widget.barBackgroundColor, ),
         ),
       ],
       showingTooltipIndicators: showTooltips,
@@ -114,7 +118,7 @@ class WeekdayBarChartState extends State<WeekdayBarChart> {
           getTooltipItem: (group, groupIndex, rod, rodIndex) {
             return BarTooltipItem(
               (rod.toY - 1).toStringAsFixed(2),
-              TextStyle(color: widget.barColor, fontSize: 16, fontWeight: FontWeight.w500,),
+              TextStyle(color: widget.labelTextColor, fontSize: 16, fontWeight: FontWeight.w500,),
             );
           },
         ),
@@ -132,19 +136,17 @@ class WeekdayBarChartState extends State<WeekdayBarChart> {
         show: true,
         rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false),),
         topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false),),
-        bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: getTitles, reservedSize: 38, ),),
+        bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (double value, TitleMeta meta) {
+          TextStyle style = TextStyle(color: widget.axisTextColor, fontWeight: FontWeight.bold, fontSize: 14);
+          List<Widget> texts = [Text('M', style: style), Text('T', style: style), Text('W', style: style), Text('T', style: style), Text('F', style: style), Text('S', style: style), Text('S', style: style)];
+          Widget text = texts[value.toInt()];
+          return SideTitleWidget( axisSide: meta.axisSide, space: 16, child: text, );
+        }, reservedSize: 38, ),),
         leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false,),),
       ),
       borderData: FlBorderData(show: false,),
       barGroups: showingGroups(),
       gridData: const FlGridData(show: false),
     );
-  }
-
-  Widget getTitles(double value, TitleMeta meta) {
-    const style = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14);
-    List<Widget> texts = [Text('M', style: style), Text('T', style: style), Text('W', style: style), Text('T', style: style), Text('F', style: style), const Text('S', style: style), const Text('S', style: style)];
-    Widget text = texts[value.toInt()];
-    return SideTitleWidget( axisSide: meta.axisSide, space: 16, child: text, );
   }
 }
